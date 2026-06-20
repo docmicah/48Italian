@@ -1,7 +1,8 @@
 # 48 Hour Italian
 
 A single-file web app that teaches travel-ready **standard Italian** in 48 fifteen-minute blocks
-(24 lessons × 8 modules). Live at **[48italian.com](https://48italian.com)**, deployed on Cloudflare Pages.
+(24 lessons × 8 modules). Live at **[48italian.com](https://48italian.com)**, deployed on Cloudflare
+Workers (static assets).
 
 Sister course: **48 Hour Portuguese** (European Portuguese) — same engine, separate repo.
 
@@ -9,7 +10,8 @@ Sister course: **48 Hour Portuguese** (European Portuguese) — same engine, sep
 
 ```
 italian.html        ← the whole app: design, quiz engine, and all lesson content
-dist/index.html     ← deploy copy (Cloudflare Pages build output dir = dist)
+dist/index.html     ← deploy copy (the static assets Cloudflare serves)
+wrangler.jsonc      ← Cloudflare Workers config: serve ./dist as static assets
 ```
 
 There is **no build step**. `dist/index.html` is just a copy of `italian.html`.
@@ -20,7 +22,33 @@ cp italian.html dist/index.html
 git add -A && git commit -m "..." && git push
 ```
 
-Every push to `main` auto-deploys via Cloudflare Pages.
+Every push to `main` auto-deploys.
+
+## Deployment (Cloudflare Workers, static assets)
+
+This project is served as a **Cloudflare Workers** assets-only deploy (no Worker script), wired to
+this GitHub repo. The config lives in `wrangler.jsonc`:
+
+```jsonc
+{
+  "name": "48italian",
+  "compatibility_date": "2026-06-20",
+  "assets": { "directory": "./dist" }   // everything in ./dist is served as the site
+}
+```
+
+How it's set up in the Cloudflare dashboard (Workers & Pages → the `48italian` project):
+
+- **Connected repo:** `docmicah/48Italian`, production branch `main`.
+- **Build command:** *(empty)*  ·  **Deploy command:** `npx wrangler deploy`.
+- On each push, Cloudflare clones the repo, reads `wrangler.jsonc`, and publishes `./dist`.
+- **URLs:** `https://48italian.<account>.workers.dev` and the custom domain **`48italian.com`**
+  (added under the project's **Domains** tab; DNS + SSL auto-created since the zone is in the account).
+
+> Note: the sister course **48 Hour Portuguese** is deployed via Cloudflare **Pages** instead
+> (build output dir = `dist`, no `wrangler.jsonc`). Both approaches serve the same single-file app;
+> this one just happens to use Workers. To migrate this project to Pages later, create a Pages
+> project from the same repo with output directory `dist` — `wrangler.jsonc` is then ignored.
 
 ## How the content is organised
 
