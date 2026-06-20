@@ -1,0 +1,7 @@
+{
+  // Serves the static site in ./dist as a Cloudflare Workers assets-only deploy.
+  // (Used when the project is created via the Workers "Import Git repository" flow.)
+  "name": "48italian",
+  "compatibility_date": "2026-06-20",
+  "assets": { "directory": "./dist" }
+}
