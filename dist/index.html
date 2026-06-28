@@ -3919,8 +3919,8 @@ function lessonComplete(id){
 }
 function lessonAuthored(id){ return !!lessonObj(id); }
 function lessonUnlocked(id){
-  if(id===1) return true;
-  return lessonComplete(id-1);
+  // No prerequisites — any authored lesson is open. (Locking removed by request.)
+  return lessonAuthored(id);
 }
 function countDoneLessons(){ return MAP.filter(m=>lessonComplete(m.id)).length; }
 
